@@ -57,6 +57,18 @@ dotnet build ... -p:SptRoot="F:\SPT_4.1 - Dev"         # other install
 dotnet test                                            # 36 tests, no game needed
 ```
 
+## Cutting a release
+
+GitHub-hosted runners can't build this (no access to the EFT/BepInEx/Fika/SO assemblies above,
+and they're not redistributable). `release.yml` only drafts the GitHub Release; attach the DLL by hand:
+
+```bash
+dotnet build src/StanceOverhaulFika -c Release -p:SkipDeploy=true
+git tag v0.1.0 && git push origin v0.1.0                 # triggers release.yml, creates a draft release
+gh release upload v0.1.0 src/StanceOverhaulFika/bin/Release/netstandard2.1/StanceOverhaulFika.dll
+gh release edit v0.1.0 --draft=false                      # publish once the DLL is attached
+```
+
 ## Layout
 
 ```

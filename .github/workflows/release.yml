@@ -1,0 +1,29 @@
+name: Release
+
+# This repo can't be built on GitHub-hosted runners: compiling StanceOverhaulFika needs
+# EFT/BepInEx/Fika/Stance Overhaul assemblies that only exist on a local SPT install and are
+# not redistributable (see tools/build-reference-libs.ps1, .gitignore'd lib/). So this workflow
+# only creates the GitHub Release as a draft from the pushed tag; the DLL is built locally and
+# attached by hand (see "Cutting a release" in README.md).
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            --draft
