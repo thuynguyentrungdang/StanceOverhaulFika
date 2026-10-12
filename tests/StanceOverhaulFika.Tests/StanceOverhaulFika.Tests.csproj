@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core has no Unity/Fika/BepInEx dependency, so it compiles straight into the test assembly -->
+    <Compile Include="..\..\src\StanceOverhaulFika\Core\*.cs" LinkBase="Core" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <SptRoot Condition="'$(SptRoot)' == ''">F:\SPT_4.1</SptRoot>
+    <FikaCore Condition="'$(FikaCore)' == ''">$(SptRoot)\BepInEx\plugins\Fika\Fika.Core.dll</FikaCore>
+    <FikaCore Condition="!Exists('$(FikaCore)')">$(MSBuildThisFileDirectory)..\..\lib\Fika.Core.dll</FikaCore>
+  </PropertyGroup>
+
+  <!-- wire-format tests need Fika's NetDataWriter/Reader; skipped automatically when Fika.Core.dll is not around -->
+  <ItemGroup Condition="Exists('$(FikaCore)')">
+    <Reference Include="Fika.Core">
+      <HintPath>$(FikaCore)</HintPath>
+    </Reference>
+    <Compile Include="..\..\src\StanceOverhaulFika\Net\StancePosePacket.cs" LinkBase="Net" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(FikaCore)')">
+    <Compile Remove="WireFormatTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+</Project>

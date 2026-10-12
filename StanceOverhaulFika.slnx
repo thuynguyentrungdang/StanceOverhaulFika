@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StanceOverhaulFika/StanceOverhaulFika.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/StanceOverhaulFika.Tests/StanceOverhaulFika.Tests.csproj" />
+  </Folder>
+</Solution>

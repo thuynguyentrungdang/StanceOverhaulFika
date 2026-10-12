@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+# reference DLLs copied in by tools/build-reference-libs.ps1 (not redistributable / machine specific)
+lib/*.dll

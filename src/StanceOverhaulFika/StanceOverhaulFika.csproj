@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>StanceOverhaulFika</AssemblyName>
+    <RootNamespace>StanceOverhaulFika</RootNamespace>
+    <Authors>kobethuy</Authors>
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- SPT 4.1 client install used for game / BepInEx / Fika references. Override: -p:SptRoot=F:\SPT_4.1 - Dev -->
+    <SptRoot Condition="'$(SptRoot)' == ''">F:\SPT_4.1</SptRoot>
+    <GameManaged>$(SptRoot)\EscapeFromTarkov_Data\Managed</GameManaged>
+
+    <!-- prefer the install's own copy, fall back to lib\ (gitignored; see tools\build-reference-libs.ps1) -->
+    <FikaCore Condition="'$(FikaCore)' == ''">$(SptRoot)\BepInEx\plugins\Fika\Fika.Core.dll</FikaCore>
+    <FikaCore Condition="!Exists('$(FikaCore)')">$(MSBuildThisFileDirectory)..\..\lib\Fika.Core.dll</FikaCore>
+    <StanceOverhaulDll Condition="'$(StanceOverhaulDll)' == ''">$(SptRoot)\BepInEx\plugins\Realism\spt-stance-overhaul.dll</StanceOverhaulDll>
+    <StanceOverhaulDll Condition="!Exists('$(StanceOverhaulDll)')">$(MSBuildThisFileDirectory)..\..\lib\spt-stance-overhaul.dll</StanceOverhaulDll>
+    <CommonLibDll Condition="'$(CommonLibDll)' == ''">$(SptRoot)\BepInEx\plugins\Realism\spt-realism-common-lib.dll</CommonLibDll>
+    <CommonLibDll Condition="!Exists('$(CommonLibDll)')">$(MSBuildThisFileDirectory)..\..\lib\spt-realism-common-lib.dll</CommonLibDll>
+
+    <InstallDir>$(SptRoot)\BepInEx\plugins\kobethuy-StanceOverhaulFika</InstallDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Fika.Core">
+      <HintPath>$(FikaCore)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- compile-time only: used inside Sender\StanceSource.cs, loaded at runtime only if the mod is installed -->
+    <Reference Include="spt-stance-overhaul">
+      <HintPath>$(StanceOverhaulDll)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="spt-realism-common-lib">
+      <HintPath>$(CommonLibDll)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(SptRoot)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(SptRoot)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameManaged)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Comfort">
+      <HintPath>$(GameManaged)\Comfort.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameManaged)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameManaged)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Copies the DLL into the game's plugins folder after every build. Skip with -p:SkipDeploy=true -->
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(SkipDeploy)' != 'true'">
+    <MakeDir Directories="$(InstallDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(InstallDir)" SkipUnchangedFiles="false" />
+  </Target>
+
+</Project>
